@@ -1,0 +1,24 @@
+{
+  "name": "library-system-backend",
+  "version": "1.0.0",
+  "description": "Recruitment test",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Byron Jimenez",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^1.15.0",
+    "cors": "^2.7.1",
+    "errorhandler": "^1.4.3",
+    "express": "^4.13.4",
+    "express-jwt": "^7.7.5",
+    "express-session": "^1.13.0",
+    "jsonwebtoken": "^7.1.9",
+    "morgan": "^1.7.0",
+    "mysql": "^2.18.1",
+    "passport": "^0.3.2",
+    "passport-local": "^1.0.0"
+  }
+}
