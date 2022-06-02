@@ -36,5 +36,24 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'User',
   });
+
+  // hash password before save
+  User.beforeSave(async (user, options) => {
+    if (user.password) {
+      user.password = bcrypt.hashSync(user.password, bcrypt.genSaltSync(10), null);
+    }
+  });
+
+  // compare hashed password
+  User.prototype.comparePassword = function (passw, cb) {
+    bcrypt.compare(passw, this.password, function (err, isMatch) {
+        if (err) {
+            return cb(err);
+        }
+        cb(null, isMatch);
+    });
+  };
+
+
   return User;
 };
