@@ -8,6 +8,9 @@ var http = require('http'),
     errorhandler = require('errorhandler'),
     morgan = require('morgan')
 
+// setup env file
+require('dotenv').config()
+
 /// get environment
 let environment = process.env.NODE_ENV;
 
@@ -40,6 +43,10 @@ if (environment !== 'production') {
     }});
   });
 } 
+
+// connect sequelize
+const db = require("./app/models");
+db.sequelize.sync();
 
 // import all routes
 
