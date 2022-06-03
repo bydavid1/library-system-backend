@@ -1,18 +1,16 @@
-var http = require('http'),
-    path = require('path'),
-    express = require('express'),
+var express = require('express'),
     bodyParser = require('body-parser'),
-    session = require('express-session'),
     cors = require('cors'),
-    passport = require('passport'),
     errorhandler = require('errorhandler'),
-    morgan = require('morgan')
+    morgan = require('morgan');
+
 
 // setup env file
 require('dotenv').config()
 
 /// get environment
 let environment = process.env.NODE_ENV;
+console.log(environment);
 
 // setup express
 var app = express();
@@ -21,12 +19,9 @@ var app = express();
 app.use(cors());
 
 // Normal express config defaults
-app.use(morgan);
+app.use(morgan('dev'));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
-
-// config express session package
-app.use(session({ secret: 'conduit', cookie: { maxAge: 60000 }, resave: false, saveUninitialized: false  }));
 
 if (environment !== 'production') {
   // development error handler
@@ -45,10 +40,13 @@ if (environment !== 'production') {
 } 
 
 // connect sequelize
-const db = require("./app/models");
+const db = require("./models");
 db.sequelize.sync();
 
 // import all routes
+app.use('/api/auth', require('./routes/auth.routes'));
+app.use('/api/user', require('./routes/user.routes'));
+app.use('/api/role', require('./routes/role.routes'));
 
 // production error handler
 app.use(function(err, req, res, next) {
