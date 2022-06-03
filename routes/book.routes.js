@@ -3,6 +3,7 @@ const router = express.Router();
 const Book = require('../models').Book;
 const passport = require('passport');
 require('../config/passport')(passport);
+const { Op } = require("sequelize");
 
 /// Create a new role
 router.post('/', (req, res) => {
@@ -38,5 +39,40 @@ router.get('/', (req, res) => {
       });
   });
 });
+
+
+/// search by title, author or genre
+router.get('/search', (req, res) => {
+  Book
+  .findAll({
+    where: {
+      [Op.or]: [
+        {
+          title: {
+            [Op.like]: `%${req.body.query}%`
+          }
+        },
+        {
+          author: {
+            [Op.like]: `%${req.body.query}%`
+          }
+        },
+        {
+          genre: {
+            [Op.like]: `%${req.body.query}%`
+          }
+        }
+      ]
+    }
+  })
+  .then((books) => res.status(200).send(books))
+  .catch((error) => {
+      res.status(400).send({
+          success: false,
+          msg: error
+      });
+  });
+});
+
 
 module.exports = router;
