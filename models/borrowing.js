@@ -26,6 +26,12 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.DATE,
       allowNull: false
     },
+    date_confirmed: {
+      type: DataTypes.DATE,
+    },
+    date_refused: {
+      type: DataTypes.DATE,
+    },
     date_returned: DataTypes.DATE
   }, {
     sequelize,

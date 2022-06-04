@@ -1,5 +1,6 @@
 const { Op } = require("sequelize");
 const Book = require('../models').Book;
+const Borrowing = require('../models').Borrowing;
 
 class BookController {
   constructor() {}
@@ -36,8 +37,7 @@ class BookController {
   }
 
   static searchBooks(req, res) {
-    Book
-    .findAll({
+    Book.findAll({
       where: {
         [Op.or]: [
           {
@@ -64,6 +64,56 @@ class BookController {
             success: false,
             msg: error
         });
+    });
+  }
+
+  static requestBook(req, res) {
+    Book.findOne({
+      where: {
+        id: req.params.id
+      }
+    }).then((book) => {
+      Borrowing.create({
+        book_id: book.id,
+        user_id: req.user.id,
+        date_borrowed: Date.now()
+      })
+    })
+    .then((borrowing) => {
+      res.status(200).send({
+        'success': true,
+        'message': 'Book borrowing requested'
+      });
+    })
+    .catch((error) => {
+        console.log(error);
+        res.status(400).send(error);
+    });
+  }
+
+  static returntBook(req, res) {
+    Borrowing.findOne({
+      where: {
+        id: req.params.borrowing_id
+      }
+    }).then((borrowing) => {
+      Borrowing.update({
+        date_returned: Date.now()
+      }, {
+        where: {
+          id: borrowing.id
+        }
+      })
+    })
+    .then((borrowing) => {
+      res.status(200).send({
+        'success': true,
+        'message': 'Book returned'
+      });
+    })
+    .catch((error) => {
+        console.log(error);
+        res.status(400).send(error);
     });
   }
 }
