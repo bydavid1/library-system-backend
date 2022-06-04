@@ -1,77 +1,31 @@
 const express = require('express');
 const router = express.Router();
-const Book = require('../models').Book;
+
 const passport = require('passport');
 require('../config/passport')(passport);
-const { Op } = require("sequelize");
 
-/// Create a new role
-router.post('/', (req, res) => {
-  if (!req.body.title || !req.body.author || !req.body.published_year || !req.body.genre) {
-    res.status(400).send({
-        msg: 'Given data was invalid'
-    })
-  } else {
-    Book
-      .create({
-          title: req.body.title,
-          author: req.body.author,
-          published_year: req.body.published_year,
-          genre: req.body.genre
-      })
-      .then((book) => res.status(201).send(book))
-      .catch((error) => {
-          console.log(error);
-          res.status(400).send(error);
-      });
-  }
+const bookController = require('../controllers/book.controller')
+
+/// Create a new book
+router.post('/', passport.authenticate('jwt', {
+  session: false
+}),(req, res) => {
+  bookController.createBook(req, res);
 });
 
-/// Get all roles
-router.get('/', (req, res) => {
-  Book
-  .findAll()
-  .then((books) => res.status(200).send(books))
-  .catch((error) => {
-      res.status(400).send({
-          success: false,
-          msg: error
-      });
-  });
+/// Get all book
+router.get('/', passport.authenticate('jwt', {
+  session: false
+}),(req, res) => {
+  bookController.getAllBooks(req, res);
 });
 
 
 /// search by title, author or genre
-router.get('/search', (req, res) => {
-  Book
-  .findAll({
-    where: {
-      [Op.or]: [
-        {
-          title: {
-            [Op.like]: `%${req.body.query}%`
-          }
-        },
-        {
-          author: {
-            [Op.like]: `%${req.body.query}%`
-          }
-        },
-        {
-          genre: {
-            [Op.like]: `%${req.body.query}%`
-          }
-        }
-      ]
-    }
-  })
-  .then((books) => res.status(200).send(books))
-  .catch((error) => {
-      res.status(400).send({
-          success: false,
-          msg: error
-      });
-  });
+router.get('/search', passport.authenticate('jwt', {
+  session: false
+}),(req, res) => {
+  bookController.searchBooks(req, res);
 });
 
 
