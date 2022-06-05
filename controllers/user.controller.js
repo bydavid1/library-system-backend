@@ -1,4 +1,5 @@
 const User = require('../models').User;
+const Role = require('../models').Role;
 
 class UserController {
   constructor() {}
@@ -6,7 +7,7 @@ class UserController {
   static createUser(req, res) {
     if (!req.body.role_id || !req.body.email || !req.body.password || !req.body.first_name || !req.body.last_name) {
       res.status(400).send({
-        msg: 'Given data was invalid'
+        message: 'Given data was invalid'
       })
     } else {
       User.create({
@@ -22,6 +23,16 @@ class UserController {
           res.status(400).send(error);
         });
     }
+  }
+
+  static getAllUSers(req, res) {
+    User.findAll({
+          include: Role
+      })
+      .then((users) => {
+          res.status(200).send(users);
+      })
+      .catch((error) => res.status(400).send(error));
   }
 }
 

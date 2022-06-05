@@ -1,4 +1,5 @@
 const User = require('../models').User;
+const Role = require('../models').Role;
 const jwt = require('jsonwebtoken');
 
 class AuthController {
@@ -8,10 +9,12 @@ class AuthController {
     User.findOne({
             where: {
                 email: req.body.email
-            }
+            },
+            include: Role
         })
         .then((user) => {
             if (!user) {
+                console.log('Authentication failed. User not found.');
                 return res.status(401).send({
                     message: 'Authentication failed. User not found.',
                 });
@@ -24,14 +27,19 @@ class AuthController {
                     jwt.verify(token, 'nodeauthsecret', function (err, data) {
                         console.log(err, data);
                     })
+
                     res.json({
-                        success: true,
+                        email: user.email,
+                        first_name: user.first_name,
+                        last_name: user.last_name,
+                        role_name: user.Role.role_name,
                         token: 'JWT ' + token
                     });
                 } else {
+                    console.log('Authentication failed. Wrong password.');
                     res.status(401).send({
                         success: false,
-                        msg: 'Authentication failed. Wrong password.'
+                        message: 'Authentication failed. Wrong password.'
                     });
                 }
             })

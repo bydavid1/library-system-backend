@@ -8,7 +8,7 @@ class BookController {
   static createBook(req, res) {
     if (!req.body.title || !req.body.author || !req.body.published_year || !req.body.genre) {
       res.status(400).send({
-          msg: 'Given data was invalid'
+          message: 'Given data was invalid'
       })
     } else {
       Book.create({
@@ -17,7 +17,9 @@ class BookController {
             published_year: req.body.published_year,
             genre: req.body.genre
         })
-        .then((book) => res.status(201).send(book))
+        .then((book) => res.status(201).send({
+          message: "Book was created successfully"
+        }))
         .catch((error) => {
             console.log(error);
             res.status(400).send(error);
