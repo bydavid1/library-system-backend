@@ -7,7 +7,10 @@ class BorrowingController {
 
   static getAllBorrowings(req, res) {
     Borrowing.findAll({
-      include: [User, Book]
+      include: [User, Book],
+      order: [
+        ["createdAt", "DESC"],
+      ],
     })
     .then((borrowings) => {
       let jsonResource = [];

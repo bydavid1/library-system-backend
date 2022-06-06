@@ -23,6 +23,10 @@ services:
       - $PORT:$PORT
     environment:
       - DB_HOST=mysqldb
+      - DB_USER=$DB_USER
+      - DB_PASSWORD=$DB_PASSWORD
+      - DB_NAME=$DB_NAME
+      - DB_PORT=$DB_PORT
     stdin_open: true
     tty: true
 volumes: 

@@ -15,7 +15,8 @@ class BookController {
             title: req.body.title,
             author: req.body.author,
             published_year: req.body.published_year,
-            genre: req.body.genre
+            genre: req.body.genre,
+            stock: req.body.stock < 0 ? 0 : req.body.stock
         })
         .then((book) => res.status(201).send({
           message: "Book was created successfully"
@@ -39,6 +40,7 @@ class BookController {
   }
 
   static searchBooks(req, res) {
+    console.log(req.body);
     Book.findAll({
       where: {
         [Op.or]: [

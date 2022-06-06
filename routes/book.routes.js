@@ -22,7 +22,7 @@ router.get('/', passport.authenticate('jwt', {
 });
 
 /// search by title, author or genre
-router.get('/search', passport.authenticate('jwt', {
+router.post('/search', passport.authenticate('jwt', {
   session: false
 }),(req, res) => {
   bookController.searchBooks(req, res);
