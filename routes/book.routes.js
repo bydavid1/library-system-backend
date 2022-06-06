@@ -49,7 +49,7 @@ router.put('/borrowing/:id/refuse', passport.authenticate('jwt', {
 router.put('/return/:borrowing_id', passport.authenticate('jwt', {
   session: false
 }),(req, res) => {
-  bookController.returntBook(req, res);
+  bookController.returnBook(req, res);
 });
 
 module.exports = router;
