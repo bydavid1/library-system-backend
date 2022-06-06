@@ -1,13 +1,29 @@
-version: '2'
+version: '3.8'
 services:
-  web:
-    build: .
-    command: npm run dev
-    volumes:
-      - .:/usr/app/
-      - /usr/app/node_modules
-    ports:
-      - "3000:3000"
-    depends_on:
-      - postgres
+  mysqldb:
+    image: mysql:5.7
+    restart: unless-stopped
+    env_file: .env
     environment:
+      - MYSQL_ROOT_PASSWORD=$DB_PASSWORD
+      - MYSQL_DATABASE=$DB_NAME
+    ports:
+      - "3306"
+    volumes:
+      - db:/var/lib/mysql
+  app:
+    depends_on:
+      - mysqldb
+    build: 
+      context: .
+      dockerfile: ./docker/node.Dockerfile
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - $PORT:$PORT
+    environment:
+      - DB_HOST=mysqldb
+    stdin_open: true
+    tty: true
+volumes: 
+  db:
