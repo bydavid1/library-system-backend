@@ -4,7 +4,8 @@
   "description": "Recruitment test",
   "main": "app.js",
   "scripts": {
-    "dev": "nodemon app.js"
+    "dev": "nodemon app.js",
+    "start": "node app.js"
   },
   "author": "Byron Jimenez",
   "license": "ISC",
