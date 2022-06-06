@@ -69,54 +69,103 @@ class BookController {
     });
   }
 
-  static requestBook(req, res) {
-    Book.findOne({
-      where: {
-        id: req.params.id
+  static async requestBook(req, res) {
+    try {
+      const book = await Book.findOne({
+        where: {
+          id: req.params.id
+        }
+      });
+  
+      if (!book) {
+        return res.status(400).send({
+          'message': 'Book not found'
+        });
       }
-    }).then((book) => {
-      Borrowing.create({
+  
+      if (book.stock < 1) {
+        return res.status(400).send({
+          'message': 'Book is currently unavailable (stock 0)'
+        });
+      }
+  
+      const borrowing = await Borrowing.findOne({
+        where: {
+          [Op.and]: [
+            {book_id: book.id},
+            {user_id: req.user.id},
+            {
+              date_returned: {
+                [Op.is]: null
+              }
+            },
+            {
+              date_refused: {
+                [Op.is]: null
+              }
+            },
+          ],
+        }
+      });
+  
+      if (borrowing) {
+        return res.status(400).send({
+          'message': 'You have pending request available'
+        });
+      }
+  
+      const newBorrowing = Borrowing.create({
         book_id: book.id,
         user_id: req.user.id,
         date_borrowed: Date.now()
-      })
-    })
-    .then((borrowing) => {
-      res.status(200).send({
+      });
+      console.info(newBorrowing);
+      
+      return res.status(200).send({
         'success': true,
         'message': 'Book borrowing requested'
       });
-    })
-    .catch((error) => {
-        console.log(error);
-        res.status(400).send(error);
-    });
+    } catch (error) {
+      console.log(error);
+      res.status(400).send(error);
+    }
   }
 
-  static returntBook(req, res) {
-    Borrowing.findOne({
-      where: {
-        id: req.params.borrowing_id
+  static async returnBook(req, res) {
+    try {
+      const borrowing = await Borrowing.findByPk(req.params.borrowing_id);
+      if (borrowing) {
+        await Borrowing.update({
+          date_returned: Date.now()
+        }, {
+          where: {
+            id: borrowing.id
+          }
+        });
+
+        const book = await Book.findByPk(borrowing.book_id)
+
+        await Book.update({
+          stock: book.stock + 1
+        },{
+          where: {
+            id: book.id
+          }
+        })
+  
+        return res.status(200).send({
+          'success': true,
+          'message': 'Book returned'
+        });
+      } else {
+        return res.status(400).send({
+          message: 'Request not found'
+        });
       }
-    }).then((borrowing) => {
-      Borrowing.update({
-        date_returned: Date.now()
-      }, {
-        where: {
-          id: borrowing.id
-        }
-      })
-    })
-    .then((borrowing) => {
-      res.status(200).send({
-        'success': true,
-        'message': 'Book returned'
-      });
-    })
-    .catch((error) => {
-        console.log(error);
-        res.status(400).send(error);
-    });
+    } catch (error) {
+      console.log(error);
+      return res.status(400).send(error);
+    }
   }
 }
 
